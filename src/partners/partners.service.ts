@@ -1,26 +1,37 @@
 import { Injectable } from '@nestjs/common';
-import { CreatePartnerDto } from './dto/create-partner.dto';
-import { UpdatePartnerDto } from './dto/update-partner.dto';
+import { Partner } from './entities/partner.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { PartnerDto } from './dto/partner.dto';
 
 @Injectable()
 export class PartnersService {
-  create(createPartnerDto: CreatePartnerDto) {
-    return 'This action adds a new partner';
+  constructor(
+    @InjectRepository(Partner)
+    private readonly partnerRepository: Repository<Partner>,
+  ) {}
+
+  async create(partner: PartnerDto) {
+    const newPartner = this.partnerRepository.create({
+      ...partner,
+    });
+    const partnerCreated = await this.partnerRepository.save(newPartner);
+    if (partnerCreated) {
+      return partnerCreated;
+    } else {
+      return false;
+    }
   }
 
-  findAll() {
-    return `This action returns all partners`;
+  findAll(): Promise<Partner[]> {
+    return this.partnerRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} partner`;
+  findOne(id: number): Promise<Partner | null> {
+    return this.partnerRepository.findOneBy({ id });
   }
 
-  update(id: number, updatePartnerDto: UpdatePartnerDto) {
-    return `This action updates a #${id} partner`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} partner`;
+  async remove(id: number): Promise<void> {
+    await this.partnerRepository.delete(id);
   }
 }
