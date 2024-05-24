@@ -1,6 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Partner } from 'src/partners/entities/partner.entity';
+import { Partner } from 'src/partners/domain/entities/partner.entity';
+import { Project } from 'src/projects/entities/project.entity';
 @Global()
 @Module({
   imports: [
@@ -9,7 +10,7 @@ import { Partner } from 'src/partners/entities/partner.entity';
       host: 'mysql_db',
       port: 3307,
       database: 'invoices_db',
-      entities: [Partner],
+      entities: [Partner, Project],
       username: 'testuser',
       password: 'testuser123',
       synchronize: true,

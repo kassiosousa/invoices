@@ -22,8 +22,15 @@ export class PartnersController {
         await this.partnersService.create(createPartnerDto);
       return partnerCreated;
     } catch (error) {
-      throw new BadRequestException('can not create a partner');
+      throw new BadRequestException('can not create a partner', error);
     }
+  }
+
+  @Post('partner-project')
+  async createPartnerProject(
+    @Body() createPartnerProject: { partnerId: number; projectId: number },
+  ) {
+    await this.partnersService.createPartnerProject(createPartnerProject);
   }
 
   @Get()
