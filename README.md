@@ -41,6 +41,10 @@ docker compose -f docker-compose.prod.yml up --build -d
 $ npm install
 ```
 
+```bash
+$ docker compose up
+```
+
 ## Running the app
 
 ```bash
@@ -80,3 +84,4 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](LICENSE).
+

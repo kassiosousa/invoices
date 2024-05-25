@@ -1,11 +1,4 @@
-import { Partner } from 'src/partners/domain/entities/partner.entity';
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  JoinTable,
-  ManyToMany,
-} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Project {

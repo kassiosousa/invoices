@@ -1,12 +1,8 @@
 import { Partner } from 'src/partners/domain/entities/partner.entity';
-import { IPartnerRepository } from 'src/partners/domain/interfaces/partner.repository.interface';
-import { Project } from 'src/projects/entities/project.entity';
+import { Project } from 'src/projects/domain/entities/project.entity';
 import { Repository } from 'typeorm';
 
-export class PartnerRepository
-  extends Repository<Partner>
-  implements IPartnerRepository
-{
+export class PartnerRepository extends Repository<Partner> {
   createPartnerProject(partnerID: number, projectID: number): Promise<Project> {
     throw new Error('Method not implemented.');
   }

@@ -4,9 +4,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PartnerDto } from './dto/partner.dto';
 import { Partner } from './domain/entities/partner.entity';
 import { PartnerProject } from './domain/entities/partner-project.entity';
+import { IPartnerRepository } from './domain/interfaces/partner.repository.interface';
+import { Project } from 'src/projects/domain/entities/project.entity';
 
 @Injectable()
-export class PartnersService {
+export class PartnersService implements IPartnerRepository {
   constructor(
     @InjectRepository(Partner)
     private readonly partnerRepository: Repository<Partner>,
@@ -14,21 +16,7 @@ export class PartnersService {
     private readonly partnerProjectRepository: Repository<PartnerProject>,
   ) {}
 
-  async createPartnerProject(createPartnerProject: {
-    partnerId: number;
-    projectId: number;
-  }): Promise<void> {
-    const partner = await this.partnerRepository.findOne({
-      where: { id: createPartnerProject.partnerId },
-    });
-    if (!partner) {
-      throw new NotFoundException();
-    }
-    /* You can check if course with given ID exists aswell here in the same way with CourseRepository */
-    await this.partnerProjectRepository.save(createPartnerProject);
-  }
-
-  async create(partner: PartnerDto) {
+  async create(partner: PartnerDto): Promise<Partner> {
     const newPartner = this.partnerRepository.create({
       ...partner,
     });
@@ -36,8 +24,25 @@ export class PartnersService {
     if (partnerCreated) {
       return partnerCreated;
     } else {
-      return false;
+      return null;
     }
+  }
+
+  async createPartnerProject(
+    partnerID: number,
+    projectID: number,
+  ): Promise<Partner> {
+    const partner = await this.findOne(partnerID);
+    if (!partner) {
+      throw new NotFoundException();
+    } else {
+      const newParterProject: PartnerProject = {
+        partnerId: projectID,
+        projectId: projectID,
+      };
+      await this.partnerProjectRepository.save(newParterProject);
+    }
+    return partner;
   }
 
   findAll(): Promise<Partner[]> {
@@ -46,6 +51,13 @@ export class PartnersService {
 
   findOne(id: number): Promise<Partner | null> {
     return this.partnerRepository.findOneBy({ id });
+  }
+
+  findByProject(project: Project): Promise<Partner[]> {
+    throw new Error('Method not implemented.');
+  }
+  findByEmail(email: string): Promise<Partner[]> {
+    throw new Error('Method not implemented.');
   }
 
   async remove(id: number): Promise<void> {

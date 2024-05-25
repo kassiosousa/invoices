@@ -1,4 +1,4 @@
-import { Project } from 'src/projects/entities/project.entity';
+import { Project } from 'src/projects/domain/entities/project.entity';
 import {
   Entity,
   Column,
