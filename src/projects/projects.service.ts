@@ -1,30 +1,57 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Project } from './entities/project.entity';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
+import { Project } from './domain/entities/project.entity';
 import { ProjectDto } from './dto/project.dto';
 import { IPartnerRepository } from 'src/partners/domain/interfaces/partner.repository.interface';
+import { ProjectPartnersDto } from './dto/project-partners.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { PartnerProject } from 'src/partners/domain/entities/partner-project.entity';
+import { Partner } from 'src/partners/domain/entities/partner.entity';
 
 @Injectable()
 export class ProjectsService {
   constructor(
     @InjectRepository(Project)
     private readonly projectRepository: Repository<Project>,
-    @Inject('PartnerRepository')
-    private readonly partnerRepository: IPartnerRepository,
+    @InjectRepository(PartnerProject)
+    private readonly partnerProjectRepository: Repository<PartnerProject>,
+    @InjectRepository(Partner)
+    private readonly partnerRepository: Repository<Partner>,
   ) {}
 
-  async exampleMethod(): Promise<void> {
-    const partners = await this.partnerRepository.getAllPartners();
-    console.log(partners);
-  }
+  async create(project: ProjectPartnersDto) {
+    try {
+      let newProject = new ProjectDto();
+      newProject = {
+        name: project.name,
+        description: project.description,
+        stores: project.stores,
+        dateStart: project.dateStart,
+        dateReleased: project.dateReleased,
+      };
+      console.log(newProject);
+      const projectCreated: Project =
+        await this.projectRepository.save(newProject);
 
-  async create(project: ProjectDto) {
-    const projectCreated = await this.projectRepository.save(project);
-    if (projectCreated) {
-      return projectCreated;
-    } else {
-      return false;
+      if (projectCreated && project.partners.length > 0) {
+        project.partners.forEach(async (partner) => {
+          const partnerLoaded: Partner = await this.partnerRepository.findOne({
+            where: {
+              id: partner,
+            },
+          });
+          console.log(partnerLoaded);
+          if (partnerLoaded) {
+            const projectParner: PartnerProject = {
+              partnerId: partnerLoaded.id,
+              projectId: projectCreated.id,
+            };
+            this.partnerProjectRepository.save(projectParner);
+          }
+        });
+      }
+    } catch (err) {
+      throw new Error(err);
     }
   }
 
@@ -38,5 +65,9 @@ export class ProjectsService {
 
   async remove(id: number): Promise<void> {
     await this.projectRepository.delete(id);
+  }
+
+  async removePartnerProject(partnerId: string, projectId: string) {
+    throw new Error('Method not implemented.');
   }
 }

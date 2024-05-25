@@ -26,12 +26,12 @@ export class PartnersController {
     }
   }
 
-  @Post('partner-project')
-  async createPartnerProject(
-    @Body() createPartnerProject: { partnerId: number; projectId: number },
-  ) {
-    await this.partnersService.createPartnerProject(createPartnerProject);
-  }
+  // @Post('partner-project')
+  // async createPartnerProject(
+  //   @Body() createPartnerProject: { partnerId: number; projectId: number },
+  // ) {
+  //   await this.partnersService.createPartnerProject(createPartnerProject);
+  // }
 
   @Get()
   async findAll() {
