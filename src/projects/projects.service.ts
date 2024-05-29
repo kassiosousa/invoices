@@ -29,7 +29,6 @@ export class ProjectsService {
         dateStart: project.dateStart,
         dateReleased: project.dateReleased,
       };
-      console.log(newProject);
       const projectCreated: Project =
         await this.projectRepository.save(newProject);
 
@@ -37,10 +36,9 @@ export class ProjectsService {
         project.partners.forEach(async (partner) => {
           const partnerLoaded: Partner = await this.partnerRepository.findOne({
             where: {
-              id: partner,
+              id: partner.id,
             },
           });
-          console.log(partnerLoaded);
           if (partnerLoaded) {
             const projectParner: PartnerProject = {
               partnerId: partnerLoaded.id,
@@ -59,8 +57,57 @@ export class ProjectsService {
     return this.projectRepository.find();
   }
 
-  findOne(id: number): Promise<Project | null> {
-    return this.projectRepository.findOneBy({ id });
+  async findOne(id: number): Promise<ProjectPartnersDto | null> {
+    try {
+      const project: Project = await this.projectRepository.findOneBy({ id });
+      if (project) {
+        const partnersProjects: PartnerProject[] =
+          await this.partnerProjectRepository.find({
+            where: {
+              projectId: project.id,
+            },
+          });
+        if (partnersProjects.length > 0) {
+          const partnersLoaded: Partner[] = [];
+          partnersProjects.forEach(async (element) => {
+            await this.partnerRepository
+              .findOneBy({ id: element.partnerId })
+              .then((result) => {
+                partnersLoaded.push(result);
+              });
+          });
+          console.log(partnersLoaded);
+          console.log(partnersLoaded.length);
+          console.log(partnersLoaded.values);
+
+          let newProjectPartner = new ProjectPartnersDto();
+          newProjectPartner = {
+            name: project.name,
+            description: project.description,
+            stores: project.stores,
+            dateStart: project.dateStart,
+            dateReleased: project.dateReleased,
+            partners: partnersLoaded,
+          };
+          return newProjectPartner;
+        } else {
+          let projectPartnerLoaded = new ProjectPartnersDto();
+          projectPartnerLoaded = {
+            name: project.name,
+            description: project.description,
+            stores: project.stores,
+            dateStart: project.dateStart,
+            dateReleased: project.dateReleased,
+            partners: [],
+          };
+          return projectPartnerLoaded;
+        }
+      } else {
+        return null;
+      }
+    } catch (err) {
+      throw new Error(err);
+    }
   }
 
   async remove(id: number): Promise<void> {

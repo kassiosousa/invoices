@@ -44,12 +44,12 @@ export class PartnersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.partnersService.findOne(+id);
+  findOne(@Param('id') id: number) {
+    return this.partnersService.findOne(id);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.partnersService.remove(+id);
+  remove(@Param('id') id: number) {
+    return this.partnersService.remove(id);
   }
 }
